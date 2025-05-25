@@ -19,4 +19,4 @@ class TestHTMLNode(unittest.TestCase):
     def test_empty_props(self):
         html_node = HTMLNode('<H1>', 'Visit Google')
         html_props = html_node.props_to_html()
-        self.assertEqual(html_props, None)
+        self.assertEqual(html_props, '')
