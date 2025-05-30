@@ -1,5 +1,7 @@
 from textnode import TextNode, TextType
 from htmlnode import HTMLNode, LeafNode, ParentNode
+from inline import split_nodes_delimiter
+
 
 def main():
     # new_node = TextNode('This is some anchor text',TextType.LINK,  'https://www.boot.dev')
@@ -15,15 +17,18 @@ def main():
     # node = LeafNode(None, "Hello, world!")
     # print(node.to_html())
 
-    node = ParentNode(
-    "p",
-    [
-        LeafNode("b", "Bold text"),
-        LeafNode(None, "Normal text"),
-        LeafNode("i", "italic text"),
-        LeafNode(None, "Normal text"),
-    ])
-    print(node.to_html())
+    # node = ParentNode(
+    # "p",
+    # [
+    #     LeafNode("b", "Bold text"),
+    #     LeafNode(None, "Normal text"),
+    #     LeafNode("i", "italic text"),
+    #     LeafNode(None, "Normal text"),
+    # ])
+    # print(node.to_html())
+    node = TextNode("This is text with a `code block` word", TextType.TEXT)
+    retu = split_nodes_delimiter([node], '`', TextType.CODE)
+    print(retu)
 
 
 if __name__ == "__main__":
