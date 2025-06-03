@@ -1,6 +1,6 @@
 from textnode import TextNode, TextType
 from htmlnode import HTMLNode, LeafNode, ParentNode
-from inline import split_nodes_delimiter
+from inline import split_nodes_delimiter,extract_markdown_images, extract_markdown_links
 
 
 def main():
@@ -26,9 +26,14 @@ def main():
     #     LeafNode(None, "Normal text"),
     # ])
     # print(node.to_html())
-    node = TextNode("This is text with a `code block` word", TextType.TEXT)
-    retu = split_nodes_delimiter([node], '`', TextType.CODE)
-    print(retu)
+    # node = TextNode("This is text with a `code block` word", TextType.TEXT)
+    # retu = split_nodes_delimiter([node], '`', TextType.CODE)
+    # print(retu)
+    text = "This is text with a ![rick roll](https://i.imgur.com/aKaOqIh.gif) and ![obi wan](https://i.imgur.com/fJRm4Vk.jpeg)"
+    extract_markdown_images(text)
+    link_text = "This is text with a link [to boot dev](https://www.boot.dev) and [to youtube](https://www.youtube.com/@bootdotdev)"
+    links = extract_markdown_links(link_text)
+    print(links)
 
 
 if __name__ == "__main__":

@@ -1,7 +1,7 @@
 
 import unittest
 
-from inline import split_nodes_delimiter
+from inline import split_nodes_delimiter,extract_markdown_images, extract_markdown_links
 from textnode import TextType, TextNode
 
 class TestSplitNodesDelimiter(unittest.TestCase):
@@ -107,3 +107,68 @@ class TestSplitNodesDelimiter(unittest.TestCase):
             ],
             new_nodes,
         )
+
+
+class TestExtractMarkdownImages(unittest.TestCase):
+    def test_extract_markdown_images_one(self):
+        matches = extract_markdown_images(
+            "This is text with an ![image](https://i.imgur.com/zjjcJKZ.png)"
+        )
+        self.assertListEqual([("image", "https://i.imgur.com/zjjcJKZ.png")], matches)
+
+    def test_extract_markdown_images_none(self):
+        matches = extract_markdown_images(
+            "This is text with nothing in there"
+        )
+        self.assertListEqual([], matches)
+    
+    def test_extract_markdown_images_two(self):
+        matches = extract_markdown_images(
+            "This is text with ![image](https://i.imgur.com/zjjcJKZ.png) and another ![another image](https://i.bla.com/zjjcJKZ.jpg)"
+        )
+        self.assertListEqual([("image", "https://i.imgur.com/zjjcJKZ.png"), ("another image", "https://i.bla.com/zjjcJKZ.jpg")], matches)
+    
+    #shouldn't this fail?
+    def test_extract_markdown_images_empty_description(self):
+        matches = extract_markdown_images(
+            "This is text with an ![](https://i.imgur.com/zjjcJKZ.png)"
+        )
+        self.assertListEqual([("", "https://i.imgur.com/zjjcJKZ.png")], matches)
+
+    #shouldn't this fail?
+    def test_extract_markdown_images_empty_url(self):
+        matches = extract_markdown_images(
+            "This is text with an ![]()"
+        )
+        self.assertListEqual([("", "")], matches)
+
+class TestExtractMarkdownLinks(unittest.TestCase):
+    def test_extract_markdown_links_one(self):
+        matches = extract_markdown_links(
+            "This is text with an [youtube](https://youtube.com)"
+        )
+        self.assertListEqual([("youtube", "https://youtube.com")], matches)
+
+    def test_extract_markdown_links_two(self):
+        matches = extract_markdown_links(
+            "This is text with an [youtube](https://youtube.com) and [youtube](https://youtube.com)"
+        )
+        self.assertListEqual([("youtube", "https://youtube.com"),("youtube", "https://youtube.com")], matches)
+
+    def test_extract_markdown_links_malformed(self):
+        matches = extract_markdown_links(
+            "This is text with an [malformed]](httpsss://youtube.com)"
+        )
+        self.assertListEqual([], matches)
+    
+    def test_extract_markdown_links_malformed_brakets(self):
+        matches = extract_markdown_links(
+            "This is text with an (wrong brackets)(httpsss://youtube.com)"
+        )
+        self.assertListEqual([], matches)
+    
+    def test_extract_markdown_empty(self):
+        matches = extract_markdown_links(
+            "This is text with an []()"
+        )
+        self.assertListEqual([("", "")], matches)
