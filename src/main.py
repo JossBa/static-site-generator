@@ -1,6 +1,6 @@
 from textnode import TextNode, TextType
 from htmlnode import HTMLNode, LeafNode, ParentNode
-from inline import split_nodes_delimiter,extract_markdown_images, extract_markdown_links
+from inline import split_nodes_delimiter,extract_markdown_images, extract_markdown_links, split_nodes_link
 
 
 def main():
@@ -29,11 +29,14 @@ def main():
     # node = TextNode("This is text with a `code block` word", TextType.TEXT)
     # retu = split_nodes_delimiter([node], '`', TextType.CODE)
     # print(retu)
-    text = "This is text with a ![rick roll](https://i.imgur.com/aKaOqIh.gif) and ![obi wan](https://i.imgur.com/fJRm4Vk.jpeg)"
-    extract_markdown_images(text)
-    link_text = "This is text with a link [to boot dev](https://www.boot.dev) and [to youtube](https://www.youtube.com/@bootdotdev)"
-    links = extract_markdown_links(link_text)
-    print(links)
+    # text = "This is text with a ![rick roll](https://i.imgur.com/aKaOqIh.gif) and ![obi wan](https://i.imgur.com/fJRm4Vk.jpeg)"
+    # extract_markdown_images(text)
+    # link_text = "This is text with a link [to boot dev](https://www.boot.dev) and [to youtube](https://www.youtube.com/@bootdotdev)"
+    # links = extract_markdown_links(link_text)
+    # print(links)
+    node = TextNode("This is a link [to boot dev](https://www.boot.dev) and another [to youtube](https://www.youtube.com/@bootdotdev)",TextType.TEXT)
+    new_nodes = split_nodes_link([node])
+    print(new_nodes)
 
 
 if __name__ == "__main__":

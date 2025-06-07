@@ -30,4 +30,52 @@ def extract_markdown_images(text):
     return re.findall(r"!\[([^\[\]]*)\]\(([^\(\)]*)\)", text)
 
 def extract_markdown_links(text):
-    return re.findall(r"\[([^\[\]]*)]\(([^\(\)]*)\)", text)
+    return re.findall(r"(?<!!)\[([^\[\]]*)\]\(([^\(\)]*)\)", text)
+
+def split_nodes_image(old_nodes):
+    if len(old_nodes) == 0:
+        raise ValueError('Must provide node array')
+    new_nodes = []
+    for old_node in old_nodes:
+        # extract possible image from old_node string --> returns a list of tuples
+        old_node_text = old_node.text
+        extracted_images = extract_markdown_images(old_node_text)
+        for img in extracted_images:
+            if len(img) < 1:
+                return
+            # 1. part of split_text is Text, 2. part is the remaining text without the current link
+            split_text = old_node_text.split(f"![{img[0]}]({img[1]})", 1)
+            # Assign the remaining text to old_node_text for next iteration
+            old_node_text = split_text[1]
+            if split_text[0] != "":
+                new_nodes.append(TextNode(split_text[0], TextType.TEXT))
+            if img[0] != "" and img[1] != "":
+                new_nodes.append(TextNode(img[0], TextType.IMAGE, img[1]))
+        # add remaining text at the end to new_nodes 
+        if old_node_text != "":
+            new_nodes.append(TextNode(old_node_text, TextType.TEXT))
+    return new_nodes
+
+def split_nodes_link(old_nodes):
+    if len(old_nodes) == 0:
+        raise ValueError('Must provide node array')
+    new_nodes = []
+    for old_node in old_nodes:
+        # extract possible links from old_node string --> returns a list of tuples
+        old_node_text = old_node.text
+        extracted_links = extract_markdown_links(old_node_text)
+        for link in extracted_links:
+            if len(link) < 1:
+                return
+            # 1. part of split_text is Text, 2. part is the remaining text without the current link
+            split_text = old_node_text.split(f"[{link[0]}]({link[1]})", 1)
+            # Assign the remaining text to old_node_text for next iteration
+            old_node_text = split_text[1]
+            if split_text[0] != "":
+                new_nodes.append(TextNode(split_text[0], TextType.TEXT))
+            if link[0] != "" and link[1] != "":
+                new_nodes.append(TextNode(link[0], TextType.LINK, link[1]))
+        # add remaining text at the end to new_nodes 
+        if old_node_text != "":
+            new_nodes.append(TextNode(old_node_text, TextType.TEXT))
+    return new_nodes

@@ -1,7 +1,7 @@
 
 import unittest
 
-from inline import split_nodes_delimiter,extract_markdown_images, extract_markdown_links
+from inline import split_nodes_delimiter,extract_markdown_images, extract_markdown_links, split_nodes_link, split_nodes_image
 from textnode import TextType, TextNode
 
 class TestSplitNodesDelimiter(unittest.TestCase):
@@ -172,3 +172,59 @@ class TestExtractMarkdownLinks(unittest.TestCase):
             "This is text with an []()"
         )
         self.assertListEqual([("", "")], matches)
+
+
+class TestSplitNodesLink(unittest.TestCase):
+    def test_two_links(self):
+        node = TextNode("This is a link [to boot dev](https://www.boot.dev) and another [to youtube](https://www.youtube.com/@bootdotdev)",TextType.TEXT)
+        new_nodes = split_nodes_link([node])
+        self.assertEqual(str(new_nodes), "[TextNode(This is a link , TextType.TEXT), TextNode(to boot dev, TextType.LINK,https://www.boot.dev), TextNode( and another , TextType.TEXT), TextNode(to youtube, TextType.LINK,https://www.youtube.com/@bootdotdev)]")
+
+
+    def test_two_links_ending_with_text(self):
+        node = TextNode("This is a link [to boot dev](https://www.boot.dev) and another [to youtube](https://www.youtube.com/@bootdotdev) and more text.",TextType.TEXT)
+        new_nodes = split_nodes_link([node])
+        self.assertEqual(str(new_nodes), "[TextNode(This is a link , TextType.TEXT), TextNode(to boot dev, TextType.LINK,https://www.boot.dev), TextNode( and another , TextType.TEXT), TextNode(to youtube, TextType.LINK,https://www.youtube.com/@bootdotdev), TextNode( and more text., TextType.TEXT)]")
+    
+    def test_one_link(self):
+        node = TextNode("[to boot dev](https://www.boot.dev)",TextType.TEXT)
+        new_nodes = split_nodes_link([node])
+        self.assertEqual(str(new_nodes), "[TextNode(to boot dev, TextType.LINK,https://www.boot.dev)]")
+
+    def test_just_text(self):
+        node = TextNode("This is text without links",TextType.TEXT)
+        new_nodes = split_nodes_link([node])
+        self.assertEqual(str(new_nodes), "[TextNode(This is text without links, TextType.TEXT)]")
+
+    def test_image(self):
+        node = TextNode("This is text without links ![image](https://www.pictures.com)",TextType.TEXT)
+        new_nodes = split_nodes_link([node])
+        self.assertEqual(str(new_nodes), "[TextNode(This is text without links ![image](https://www.pictures.com), TextType.TEXT)]")
+
+
+class TestSplitNodesImage(unittest.TestCase):
+    def test_two_images(self):
+        node = TextNode("This is a image link ![to boot dev](https://www.boot.dev) and another ![to youtube](https://www.youtube.com/@bootdotdev)",TextType.TEXT)
+        new_nodes = split_nodes_image([node])
+        self.assertEqual(str(new_nodes), "[TextNode(This is a image link , TextType.TEXT), TextNode(to boot dev, TextType.IMAGE,https://www.boot.dev), TextNode( and another , TextType.TEXT), TextNode(to youtube, TextType.IMAGE,https://www.youtube.com/@bootdotdev)]")
+
+
+    def test_two_images_ending_with_text(self):
+        node = TextNode("This is a image link ![to boot dev](https://www.boot.dev) and another ![to youtube](https://www.youtube.com/@bootdotdev) and more text.",TextType.TEXT)
+        new_nodes = split_nodes_image([node])
+        self.assertEqual(str(new_nodes), "[TextNode(This is a image link , TextType.TEXT), TextNode(to boot dev, TextType.IMAGE,https://www.boot.dev), TextNode( and another , TextType.TEXT), TextNode(to youtube, TextType.IMAGE,https://www.youtube.com/@bootdotdev), TextNode( and more text., TextType.TEXT)]")
+    
+    def test_one_image(self):
+        node = TextNode("![to boot dev](https://www.boot.dev)",TextType.TEXT)
+        new_nodes = split_nodes_image([node])
+        self.assertEqual(str(new_nodes), "[TextNode(to boot dev, TextType.IMAGE,https://www.boot.dev)]")
+
+    def test_just_text(self):
+        node = TextNode("This is text without images",TextType.TEXT)
+        new_nodes = split_nodes_image([node])
+        self.assertEqual(str(new_nodes), "[TextNode(This is text without images, TextType.TEXT)]")
+
+    def test_link(self):
+        node = TextNode("This is text without images [link](https://www.some-link.com)",TextType.TEXT)
+        new_nodes = split_nodes_image([node])
+        self.assertEqual(str(new_nodes), "[TextNode(This is text without images [link](https://www.some-link.com), TextType.TEXT)]")
