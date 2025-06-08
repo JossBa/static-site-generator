@@ -46,8 +46,8 @@ def split_nodes_image(old_nodes):
         old_node_text = old_node.text
         extracted_images = extract_markdown_images(old_node_text)
         for img in extracted_images:
-            if len(img) < 1:
-                return
+            if len(img) != 2:
+                raise Exception("Invalid image md due to unclosed section")
             # 1. part of split_text is Text, 2. part is the remaining text without the current link
             split_text = old_node_text.split(f"![{img[0]}]({img[1]})", 1)
             # Assign the remaining text to old_node_text for next iteration
@@ -74,8 +74,8 @@ def split_nodes_link(old_nodes):
         old_node_text = old_node.text
         extracted_links = extract_markdown_links(old_node_text)
         for link in extracted_links:
-            if len(link) < 1:
-                return
+            if len(link) != 2:
+                raise Exception("Invalid link markdwon due to unclosed section")
             # 1. part of split_text is Text, 2. part is the remaining text without the current link
             split_text = old_node_text.split(f"[{link[0]}]({link[1]})", 1)
             # Assign the remaining text to old_node_text for next iteration
