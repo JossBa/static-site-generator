@@ -1,46 +1,40 @@
-from textnode import TextNode, TextType
-from htmlnode import HTMLNode, LeafNode, ParentNode
-from inline_markdown import split_nodes_delimiter,extract_markdown_images, extract_markdown_links, split_nodes_link,text_to_textnodes
-from blocks import markdown_to_blocks, block_to_block_type
+import shutil
+import os 
+
+def build():
+    # It should first delete all the contents of the destination directory (public) to ensure that the copy is clean.
+    public_path = './public'
+    path_exists = os.path.exists(public_path)
+    if path_exists:
+        try:
+            # remove public folder
+            shutil.rmtree(public_path)
+            print(f"removed {public_path}")
+        except:
+            print(f"failed to remove contents of {public_path}")
+    # create public folder
+    os.mkdir(public_path)
+    print(f"created new folder {public_path}")
+    copy_files('./static', './public')
+        
+
+
+def copy_files(src_path, dst_path):
+    entries = os.listdir(src_path)
+    if len(entries) == 0:
+        return
+    for entry in entries:
+        current_path = os.path.join(src_path, entry)
+        if os.path.isdir(current_path): 
+            new_dst_path = os.path.join(dst_path, entry)
+            os.mkdir(new_dst_path)
+            copy_files(current_path, new_dst_path)
+        if os.path.isfile(current_path):
+            shutil.copy(current_path, dst_path)
 
 def main():
-    # nodes = text_to_textnodes('This is **text** with an _italic_ word and a `code block` and an ![obi wan image](https://i.imgur.com/fJRm4Vk.jpeg) and a [link](https://boot.dev)')
-    # print(nodes)
-    blocks = markdown_to_blocks(
-        """
-# Heading Text 1
-
-
-## Heading Text 2
-
-
-````
-some code part
-```
-
-- asdasd
-- asdpmasdasd
-
-1. aspd
-2. paosd
-3. asodk
-
--apos
-1.2s;;s
-sdsdls[d
-
-]
-
--s
-
-
-- sssss
-""")
-    block_types = []
-    for block in blocks:
-        block_types.append(block_to_block_type(block))
-    
-    print(f"block types: {block_types}")
+    print("...")
+    build()
 
 
 if __name__ == "__main__":
