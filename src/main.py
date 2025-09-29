@@ -1,7 +1,7 @@
 import shutil
 import os
 
-from markdown import generate_page # type: ignore
+from src.markdown import generate_page
 
 def build():
     public_path = './public'
@@ -31,6 +31,7 @@ def copy_files(src_path, dst_path):
 
 def main():
     build()
+    
     generate_page('./content/index.md', './template.html', './public/index.html')
     
 
