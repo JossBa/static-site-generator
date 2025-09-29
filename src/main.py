@@ -1,7 +1,7 @@
 import shutil
 import os
-
-from src.markdown import generate_page
+from pathlib import Path
+from my_markdown import generate_page
 
 def build():
     public_path = './public'
@@ -16,8 +16,6 @@ def build():
     print(f"created new folder {public_path}")
     copy_files('./static', './public')
         
-
-
 def copy_files(src_path, dst_path):
     if not os.path.exists(dst_path):
         os.mkdir(dst_path)
@@ -29,10 +27,19 @@ def copy_files(src_path, dst_path):
         else:
             copy_files(current_path, new_dst_path)
 
+def generate_pages_recursive(dir_path_content, template_path, dest_dir_path):
+    for entry in os.listdir(dir_path_content):
+        src_content_path = os.path.join(dir_path_content, entry)
+        dest_content_path = os.path.join(dest_dir_path, entry)
+        if os.path.isfile(src_content_path): 
+            dest_content_path = Path(dest_content_path).with_suffix(".html")
+            generate_page(src_content_path, template_path,dest_content_path)
+        else:
+            generate_pages_recursive(src_content_path,template_path,dest_content_path)
+
 def main():
     build()
-    
-    generate_page('./content/index.md', './template.html', './public/index.html')
+    generate_pages_recursive('./content', './template.html', './public')
     
 
 if __name__ == "__main__":
