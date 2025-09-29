@@ -1,5 +1,6 @@
 import unittest
 from blocks import markdown_to_blocks, block_to_block_type, BlockType, markdown_to_html_node
+
 class TestBlocks(unittest.TestCase):
     def test_markdown_to_blocks(self):
         md = """
