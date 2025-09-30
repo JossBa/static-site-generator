@@ -39,7 +39,7 @@ def generate_pages_recursive(dir_path_content, template_path, dest_dir_path, bas
 
 def main():
     basepath = '/'
-    if len(argv) > 0:
+    if len(argv) >= 1:
         basepath = argv[1]
     print(basepath)
     static_path = './static'
