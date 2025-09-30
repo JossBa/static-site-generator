@@ -12,7 +12,7 @@ def extract_title(markdown):
         raise Exception('Markdown needs to start with # title')
 
 
-def generate_page(from_path:str, template_path:str, dest_path:str):
+def generate_page(from_path:str, template_path:str, dest_path:str, basepath):
     print(f"Generating page from {from_path} to {dest_path} using {template_path}")
     markdown_file = open(from_path)
     title = extract_title(markdown_file)
@@ -29,7 +29,8 @@ def generate_page(from_path:str, template_path:str, dest_path:str):
     html_node = markdown_to_html_node(markdown)
     html_str = html_node.to_html()
     template = template.replace('{{ Title }}', title).replace('{{ Content }}', html_str)
-
+    template = template.replace("href=\"/", f"href=\"{basepath}")
+    template = template.replace("src=\"/",f"src=\"{basepath}" )
     dir_name = os.path.dirname(dest_path)
     if dir_name != "":
         os.makedirs(dir_name, exist_ok=True)

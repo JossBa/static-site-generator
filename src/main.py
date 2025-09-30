@@ -2,19 +2,19 @@ import shutil
 import os
 from pathlib import Path
 from my_markdown import generate_page
+from sys import argv
 
-def build():
-    public_path = './public'
-    path_exists = os.path.exists(public_path)
+def clean_up(static_path, dest_path):
+    path_exists = os.path.exists(dest_path)
     if path_exists:
         try:
-            shutil.rmtree(public_path)
-            print(f"removed {public_path}")
+            shutil.rmtree(dest_path)
+            print(f"removed {dest_path}")
         except:
-            print(f"failed to remove contents of {public_path}")
-    os.mkdir(public_path)
-    print(f"created new folder {public_path}")
-    copy_files('./static', './public')
+            print(f"failed to remove contents of {dest_path}")
+    os.mkdir(dest_path)
+    print(f"created new folder {dest_path}")
+    copy_files(static_path, dest_path)
         
 def copy_files(src_path, dst_path):
     if not os.path.exists(dst_path):
@@ -27,21 +27,27 @@ def copy_files(src_path, dst_path):
         else:
             copy_files(current_path, new_dst_path)
 
-def generate_pages_recursive(dir_path_content, template_path, dest_dir_path):
+def generate_pages_recursive(dir_path_content, template_path, dest_dir_path, basepath):
     for entry in os.listdir(dir_path_content):
         src_content_path = os.path.join(dir_path_content, entry)
         dest_content_path = os.path.join(dest_dir_path, entry)
         if os.path.isfile(src_content_path): 
             dest_content_path = Path(dest_content_path).with_suffix(".html")
-            generate_page(src_content_path, template_path,dest_content_path)
+            generate_page(src_content_path, template_path,dest_content_path, basepath)
         else:
-            generate_pages_recursive(src_content_path,template_path,dest_content_path)
+            generate_pages_recursive(src_content_path,template_path,dest_content_path, basepath)
 
 def main():
-    build()
-    generate_pages_recursive('./content', './template.html', './public')
-    
+    basepath = '/'
+    if len(argv) > 0:
+        basepath = argv[1]
+    print(basepath)
+    static_path = './static'
+    dest_path = './docs'
+    template_path = './template.html'
+    content_path = './content'
+    clean_up(static_path, dest_path)
+    generate_pages_recursive(content_path, template_path, dest_path, basepath)
 
 if __name__ == "__main__":
     main()
-
